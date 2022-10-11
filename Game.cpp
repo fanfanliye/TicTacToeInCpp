@@ -1,9 +1,9 @@
 #include "Game.h"
 
 using std::cout;
+using std::cin;
 
 namespace interface {
-
 
 GridMat::GridMat() {
   ReSet();
@@ -67,9 +67,9 @@ void GridMat::DrawGrid(bool draw_remain) {
 		  cout << "|";
 		} else if (j % 4 == 1) {
 		  if (draw_remain) {
-			cout << (grid_mat[i / 2][j / 4] > 0 ? ' ' : i / 2 * 3 + j / 4 + 1);
+			cout << char(grid_mat[i / 2][j / 4] > 0 ? ' ' : i / 2 * 3 + j / 4 + 1 + 48);
 		  } else {
-			cout << MARKS[grid_mat[i / 2][j / 4]];
+			cout << marks[grid_mat[i / 2][j / 4]];
 		  }
 		} else {
 		  cout << " ";
@@ -84,5 +84,123 @@ void GridMat::DrawGrid(bool draw_remain) {
 	}
 	cout << "\n";
   }
+}
+
+int GridMat::ValueAtLoc(int loc) {
+  if (loc >= 0 && loc <9) {
+	return grid_mat[loc / 3][loc % 3];
+  } else {
+	std::cerr << "Not a valid location!" << std::endl;
+	return -1;
+  }
+}
+
+void Game::PrintStart() {
+  cout << "###############################" << std::endl;
+  cout << "Welcome to Tic-Tac-Toe!" << std::endl;
+  cout << "The game will start!" << std::endl;
+}
+
+int Game::GetPlayerInput() {
+  cout << "The current available spots:" << std::endl;
+  grid_mat.DrawGrid(true);
+  cout << "Please select your location: ";
+  int loc;
+  cin >> loc;
+  loc--;
+  while (grid_mat.ValueAtLoc(loc) != 0) {
+	cout << "Please select again: ";
+	cin >> loc;
+	loc--;
+  }
+  cout << "OK, you select location: " << loc + 1 << std::endl;
+  return loc;
+}
+
+void Game::CheckPlayCpu() {
+
+}
+
+void Game::GetPlayerNames(int player_id) {
+  std::string player_name;
+  cout << "Please enter the name for player " << player_id << ": ";
+  cin >> player_name;
+  cout << "Player " << player_id << " name: " << player_name << std::endl;
+  player_name_to_id[player_name] = player_id;
+  player_names[player_id - 1] = player_name;
+}
+
+void Game::PrintPlayerNames() {
+  cout << "######" << std::endl;
+  int player_id;
+  for (const auto& name : player_names) {
+	player_id = player_name_to_id[name];
+	cout << "Player " << player_id << ": " << name << " --- " << marks[player_id] << std::endl;
+  }
+  cout << "######" << std::endl;
+}
+
+void Game::PrintGameOver(int winner_id) {
+  cout << "Game Over!" << std::endl;
+  if (winner_id > 0) {
+	cout << "Winner is: " << player_names[winner_id - 1] << std::endl;
+  } else {
+	cout << "It is a draw!\n";
+  }
+}
+
+void Game::PrintEnd() {
+  cout << "Exiting game...\nDone\n";
+}
+
+void Game::GameIterPlayer(int player_id) {
+  cout << "-------------------\n";
+  cout << "It is your turn, " << player_names[player_id - 1] << std::endl;
+  int loc = GetPlayerInput();
+  grid_mat.UpdateAtLoc(loc, player_id);
+  cout << "Current Grid:\n";
+  grid_mat.DrawGrid(false);
+  cout << "-------------------\n\n";
+}
+
+Game::Game() {
+  play_game = true;
+  PrintStart();
+  GetPlayerNames(1);
+  GetPlayerNames(2);
+  PrintPlayerNames();
+  grid_mat.ReSet();
+}
+
+void Game::GameLoop() {
+  cout << "Let's start the game! We start from player 1.\n";
+  int cur_player_id = 2;
+  while (grid_mat.DetermineWinner() == 0) {
+	cur_player_id = 3 - cur_player_id;
+	GameIterPlayer(cur_player_id);
+  }
+  PrintGameOver(grid_mat.DetermineWinner());
+}
+
+bool Game::AskContinue() {
+  char play;
+  cout << "Another round? (Y/N)" << std::endl;
+  cin >> play;
+  if (play == 'Y' || play == 'y') {
+	cout << "OK, a new game will be started!" << std::endl;
+	return true;
+  } else {
+	cout << "All right, I take that a NO." << std::endl;
+	return false;
+  }
+}
+
+void Game::PlayGame() {
+  while (play_game) {
+	grid_mat.ReSet();
+	GameLoop();
+	play_game = AskContinue();
+  }
+  PrintEnd();
 }
 } // interface

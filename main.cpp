@@ -1,6 +1,10 @@
 #include <iostream>
+#include "Game.h"
+
+using interface::Game;
+using std::cout;
 
 int main() {
-  std::cout << "Hello, World!" << std::endl;
-  return 0;
+  Game game;
+  game.PlayGame();
 }
