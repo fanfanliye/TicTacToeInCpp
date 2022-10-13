@@ -3,4 +3,4 @@ project(TicTacToeInCpp)
 
 set(CMAKE_CXX_STANDARD 14)
 
-add_executable(TicTacToeInCpp main.cpp Game.cpp)
+add_executable(TicTacToeInCpp main.cpp Game.cpp logic.cpp)

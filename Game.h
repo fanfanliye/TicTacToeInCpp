@@ -17,22 +17,22 @@ class GridMat {
  public:
   GridMat();
   void ReSet();
-  void UpdateAtLoc(int loc, int player_id);
+  void UpdateAtIndex(int index, int player_id);
   int DetermineWinner();
   void DrawGrid(bool draw_remain=false);
-  int ValueAtLoc(int loc);
+  int ValueAtIndex(int index);
 };
 
 class Game {
  private:
-  char play_cpu = 'N';  // TODO: figure out how to input bool directly
+  bool play_cpu;
   const char marks[3] = {' ', 'O', 'X'};
   bool play_game;
   std::vector<std::string> player_names = {"", ""};
   std::unordered_map<std::string, int> player_name_to_id;
   GridMat grid_mat;
   int GetPlayerInput();
-  void CheckPlayCpu();
+  static bool CheckPlayCpu();
   void PrintEnd();
   void GameIterPlayer(int player_id);
   void PrintStart();
@@ -40,7 +40,8 @@ class Game {
   void GetPlayerNames(int player_id);
   void PrintGameOver(int winner_id);
   void GameLoop();
-  bool AskContinue();
+  static bool AskContinue();
+  void GameIterCPU();
 
  public:
   Game();
